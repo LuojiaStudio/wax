@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 
 # Basic information
@@ -75,16 +77,19 @@ class Department(BaseOrganization):
         on_delete=models.CASCADE
     )
 
+    def __str__(self):
+        return self.student_union_belongs_to.__str__() + self.name
+
 
 class JobTitle(models.Model):
-    department = models.ForeignKey(
-        Department,
-        related_name='job_titles'
-    )
+    limit = models.Q(app_label='user', model='department') | models.Q(app_label='user', model='studentunion')
+    organization_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to=limit)
+    organization_id = models.PositiveIntegerField()
+    organization_object = GenericForeignKey('organization_type', 'organization_id')
     name = models.CharField(max_length=10)
 
     def __str__(self):
-        return self.department.student_union_belongs_to.name + self.department.name + self.name
+        return self.organization_object.__str__() + self.name
 
 
 # User information
