@@ -66,7 +66,8 @@ class StudentUnion(BaseOrganization):
         School,
         related_name='student_union_in',
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        blank=True
     )
 
 
