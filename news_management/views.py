@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from django.http import Http404
 from django.contrib.auth.decorators import permission_required
 from .permissions import IsNewsEditor
@@ -53,6 +54,8 @@ class ArticleDetail(APIView):
     """
     Retrieve, update or delete a article or an unchecked article
     """
+    authentication_classes = (SessionAuthentication, TokenAuthentication)
+
     @staticmethod
     def get_article_object(pk):
         try:
@@ -102,6 +105,32 @@ class UncheckedArticleDestroy(generics.DestroyAPIView):
     queryset = UncheckedArticle.objects.all()
     serializer_class = UncheckedArticleSerializer
     permission_classes = (IsNewsEditor, )
+
+
+@api_view(['POST'])
+@permission_classes((IsNewsEditor, ))
+@authentication_classes((TokenAuthentication, ))
+def check(request, pk):
+    try:
+        unchecked_article = UncheckedArticle.objects.get(pk=pk)
+    except UncheckedArticle.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # dirty code
+    article = Article(
+        title=unchecked_article.title,
+        subtitle=unchecked_article.subtitle,
+        author=unchecked_article.author,
+        editor=request.user,
+        tags=unchecked_article.tags,
+        content=unchecked_article.content
+    )
+    article.save()
+    return Response(status=status.HTTP_201_CREATED)
+
+
+
+
 
 
 
