@@ -17,4 +17,4 @@ class ArticleApiTest(TestCase):
         request = self.factory.get(path, data, format='json')
         response = ArticleList.as_view()(request)
 
-        print(response)
+

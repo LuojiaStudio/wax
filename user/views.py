@@ -68,3 +68,4 @@ def change_password(request):
     user.password = make_password(request.data['new_pwd'])
     user.save()
     return Response(status=status.HTTP_200_OK)
+

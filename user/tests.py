@@ -34,7 +34,6 @@ class LoginTest(TestCase):
     def test_create_token_func(self):
         user = User.objects.get(username='test_user')
         token = create_token(user=user)
-        print(token)
         self.assertEqual(token is not None, True)
 
     def test_login_api(self):
@@ -52,7 +51,6 @@ class LoginTest(TestCase):
         response_username = login(request_username)
         response_student_number = login(request_student_number)
 
-        print(response_username)
         self.assertEqual(response_username.status_code, 202)
         self.assertEqual(response_student_number.status_code, 202)
 
