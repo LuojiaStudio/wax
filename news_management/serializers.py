@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import UncheckedArticle, Article
+from .models import Article, Tag
 from user.models import Staff
 
 
@@ -20,13 +20,13 @@ class BaseArticleSerializer(serializers.ModelSerializer):
         )
 
 
-class UncheckedArticleSerializer(BaseArticleSerializer):
-
-    class Meta:
-        model = UncheckedArticle
-
-
 class ArticleSerializer(BaseArticleSerializer):
 
     class Meta:
         model = Article
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ('id', 'name', 'is_main', 'is_source')

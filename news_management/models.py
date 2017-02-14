@@ -3,7 +3,7 @@ from user.models import Staff
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=10, unique=True)
     is_main = models.BooleanField(default=False)  # whether be navigation
     is_source = models.BooleanField(default=False)  # show which department create the post
 
@@ -16,29 +16,13 @@ class BasePost(models.Model):
     Abstract Post model, including article, album and video
     """
     title = models.CharField(max_length=50)
-    author = models.ForeignKey(
-        Staff,
-        related_name='created_posts',
-        on_delete=models.SET_NULL,
-        null=True
-    )
-    editor = models.ForeignKey(
-        Staff,
-        related_name='checked_posts',
-        on_delete=models.SET_NULL,
-        null=True
-    )
     create_time = models.DateTimeField(auto_now_add=True)
+    issuing_time = models.DateTimeField(null=True, blank=True)
     last_modify_time = models.DateTimeField(auto_now=True)
-
-    tags = models.ManyToManyField(
-        Tag,
-        related_name='marked_posts',
-
-    )
-
+    is_checked = models.BooleanField()
     view_number = models.IntegerField(default=0)
     like_number = models.IntegerField(default=0)
+    cover = models.CharField(max_length=100)
 
     def __str__(self):
         return self.title
@@ -47,57 +31,30 @@ class BasePost(models.Model):
         abstract = True
 
 
-class BaseArticle(BasePost):
-    content = models.TextField()
-    subtitle = models.CharField(max_length=50, blank=True)
-
-    class Meta:
-        abstract = True
-
-
-class UncheckedArticle(BaseArticle):
-    """
-    unchecked article
-    """
-    author = models.ForeignKey(
-        Staff,
-        related_name='created_unchecked_articles',
-        on_delete=models.SET_NULL,
-        null=True
-    )
-    editor = models.ForeignKey(
-        Staff,
-        related_name='checked_unchecked_articles',
-        on_delete=models.SET_NULL,
-        null=True
-    )
-    tags = models.ManyToManyField(
-        Tag,
-        related_name='marked_unchecked_articles',
-
-    )
-
-
-class Article(BaseArticle):
+class Article(BasePost):
     """
     checked article, display on the web site
     """
-    author = models.ForeignKey(
+    content = models.TextField()
+    author = models.CharField(max_length=20, null=True, blank=True)
+    photographer = models.CharField(max_length=20, null=True, blank=True)
+    create_staff = models.ForeignKey(
         Staff,
         related_name='created_articles',
-        on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        blank=True
     )
-    editor = models.ForeignKey(
+    checked_staff = models.ForeignKey(
         Staff,
         related_name='checked_articles',
-        on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        blank=True
     )
     tags = models.ManyToManyField(
         Tag,
         related_name='marked_articles',
-
+        null=True,
+        blank=True
     )
 
 
