@@ -1,5 +1,7 @@
 from django.db import models
 from user.models import Staff
+from django.utils.timesince import timesince
+from django.utils import timezone
 
 
 class Tag(models.Model):
@@ -23,6 +25,11 @@ class BasePost(models.Model):
     view_number = models.IntegerField(default=0)
     like_number = models.IntegerField(default=0)
     cover = models.CharField(max_length=100)
+
+    def _get_humanize_time(self):
+        return timesince(self.create_time, timezone.now())
+
+    humaniza_create_time = property(_get_humanize_time)
 
     def __str__(self):
         return self.title
@@ -53,8 +60,6 @@ class Article(BasePost):
     tags = models.ManyToManyField(
         Tag,
         related_name='marked_articles',
-        null=True,
-        blank=True
     )
 
 

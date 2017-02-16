@@ -138,6 +138,12 @@ from django.views.decorators.csrf import csrf_exempt
 class ArticleList(generics.ListCreateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
+    filter_backends = (
+        django_filters.rest_framework.DjangoFilterBackend,
+        filters.SearchFilter
+    )
+    search_fields = ('title',)
+    filter_fields = ('tags', )
 
 
 class TagList(generics.ListCreateAPIView):

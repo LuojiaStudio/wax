@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^user/', include('user.urls')),
     url(r'^news/', include('news_management.urls')),
     url(r'^docs/', include('rest_framework_docs.urls')),
+    url(r'^file/', include('file.urls'))
 ]

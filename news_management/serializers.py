@@ -3,27 +3,27 @@ from .models import Article, Tag
 from user.models import Staff
 
 
-class BaseArticleSerializer(serializers.ModelSerializer):
+class ArticleSerializer(serializers.ModelSerializer):
+    tags = serializers.StringRelatedField(many=True)
 
     class Meta:
+        model = Article
         fields = (
             'title',
-            'subtitle',
             'author',
-            'editor',
+            'create_staff',
+            'checked_staff',
+            'cover',
             'create_time',
+            'humaniza_create_time',
             'last_modify_time',
+            'issuing_time',
+            'is_checked',
             'tags',
             'view_number',
             'like_number',
             'content',
         )
-
-
-class ArticleSerializer(BaseArticleSerializer):
-
-    class Meta:
-        model = Article
 
 
 class TagSerializer(serializers.ModelSerializer):
