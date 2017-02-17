@@ -6,6 +6,7 @@ from .models import Article, Tag
 from user.models import Staff
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import pagination
 from rest_framework import generics
 from rest_framework import filters
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -135,6 +136,12 @@ from django.views.decorators.csrf import csrf_exempt
 #     return Response(status=status.HTTP_201_CREATED)
 
 
+class StandardResultsPagination(pagination.PageNumberPagination):
+    page_size = 100
+    page_query_param = 'page_size'
+    max_page_size = 1000
+
+
 class ArticleList(generics.ListCreateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
@@ -154,7 +161,10 @@ class TagList(generics.ListCreateAPIView):
         filters.SearchFilter
     )
     filter_fields = ('id', 'name', 'is_main', 'is_source')
-    search_fields = ('name',)
+    search_fields = ('name',),
+    pagination_class = StandardResultsPagination
+
+
 
 
 
