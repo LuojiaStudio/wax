@@ -62,6 +62,17 @@ class Article(BasePost):
         related_name='marked_articles',
     )
 
+    def generate_tags_str(self):
+        tags_str_arr = []
+        for tag in self.tags.all():
+            tags_str_arr.append(tag.name)
+        return "/".join(tags_str_arr)
+
+    tags_str = property(generate_tags_str)
+
+    class Meta:
+        ordering = ['-id']
+
 
 
 
