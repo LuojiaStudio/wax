@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 import oss2
 import uuid
 
+
 @csrf_exempt
 def upload_to_OSS(request):
     auth = oss2.Auth('LTAI73ZjdVlqmMUx', 'Pqwo3P15hEV2PR8EncWFBucq2M8GVv')

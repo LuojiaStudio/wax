@@ -22,8 +22,6 @@ class BasePost(models.Model):
     issuing_time = models.DateTimeField(null=True, blank=True)
     last_modify_time = models.DateTimeField(auto_now=True)
     is_checked = models.BooleanField()
-    view_number = models.IntegerField(default=0)
-    like_number = models.IntegerField(default=0)
     cover = models.CharField(max_length=100)
 
     def _get_humanize_time(self):
@@ -62,6 +60,8 @@ class Article(BasePost):
         related_name='marked_articles',
     )
 
+    like_number = models.IntegerField(default=0)
+
     def generate_tags_str(self):
         tags_str_arr = []
         for tag in self.tags.all():
@@ -70,8 +70,49 @@ class Article(BasePost):
 
     tags_str = property(generate_tags_str)
 
+    def _get_view_number(self):
+        views = View.objects.filter(article=self)
+        view_set = set()
+        for view in views:
+            view_set.add(view.ip)
+
+        return len(view_set)
+
+    view_number = property(_get_view_number)
+
+
     class Meta:
         ordering = ['-id']
+
+
+class View(models.Model):
+    """
+    Article view
+    """
+    ip = models.GenericIPAddressField()
+    article = models.ForeignKey(
+        Article,
+        related_name='views'
+    )
+    time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.ip
+
+
+class Like(models.Model):
+    """
+    Article like
+    """
+    ip = models.GenericIPAddressField()
+    article = models.ForeignKey(
+        Article,
+        related_name='likes'
+    )
+    time = models.DateTimeField()
+
+    def __str__(self):
+        return self.ip
 
 
 

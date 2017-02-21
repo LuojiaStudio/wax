@@ -18,6 +18,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'author',
+            'photographer',
             'create_staff',
             'checked_staff',
             'cover',
