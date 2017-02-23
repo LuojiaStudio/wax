@@ -8,7 +8,10 @@ from .models import Student
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework import status
+from django.http import JsonResponse, Http404
+from django.contrib.auth.models import User
 
 
 # login
@@ -68,4 +71,20 @@ def change_password(request):
     user.password = make_password(request.data['new_pwd'])
     user.save()
     return Response(status=status.HTTP_200_OK)
+
+
+class Profile(APIView):
+
+    def get_student_object(self, user):
+        try:
+            return Student.objects.get(user=user)
+        except Student.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        return JsonResponse({
+            'username': request.user.username,
+            'name': request.user.get_full_name(),
+            'avatar': self.get_student_object(request.user).avatar_path,
+        })
 

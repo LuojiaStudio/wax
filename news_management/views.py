@@ -34,7 +34,7 @@ class ArticleList(generics.ListCreateAPIView):
         filters.SearchFilter
     )
     search_fields = ('title',)
-    filter_fields = ('tags', )
+    filter_fields = ('tags', 'is_checked')
 
 
 class TagList(generics.ListCreateAPIView):
