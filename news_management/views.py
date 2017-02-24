@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import ArticleSerializer, TagSerializer
 from .models import Article, Tag, View
-from user.models import Staff
+from user.models import Staff, Student
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import pagination
@@ -35,6 +35,24 @@ class ArticleList(generics.ListCreateAPIView):
     )
     search_fields = ('title',)
     filter_fields = ('tags', 'is_checked')
+    authentication_classes(IsAuthenticatedOrReadOnly,)
+
+    def create(self, request, *args, **kwargs):
+        data=request.data
+        student = Student.objects.get(user=request.user)
+        staff = Staff.objects.get(student=student)
+        data['create_staff'] = staff.id
+        if (request.user.has_perm('news_management.can_check_article')):
+            data['checked_staff'] = staff.id
+            data['is_checked'] = True
+        else:
+            data['is_checked'] = False
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 
 class TagList(generics.ListCreateAPIView):

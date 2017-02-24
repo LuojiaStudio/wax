@@ -112,6 +112,7 @@ class Student(models.Model):
         default=None
     )
     avatar_path = models.URLField(blank=True, null=True)
+    tel = models.CharField(max_length=20, blank=True, null=True)
     wechat = models.CharField(max_length=100, blank=True, null=True)
     qq = models.CharField(max_length=20, blank=True, null=True)
     birthday = models.DateField(blank=True, null=True)

@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from .models import Student
+from .models import Student, Staff
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -81,10 +81,37 @@ class Profile(APIView):
         except Student.DoesNotExist:
             raise Http404
 
-    def get(self, request, pk):
+    def get_staff_object(self, student):
+        try:
+            return Staff.objects.get(student=student)
+        except Staff.DoesNotExist:
+            raise Http404
+
+    def get(self, request):
+        student = self.get_student_object(request.user)
+        staff = self.get_staff_object(student)
         return JsonResponse({
             'username': request.user.username,
             'name': request.user.get_full_name(),
-            'avatar': self.get_student_object(request.user).avatar_path,
+            'student_number': student.student_number,
+            'avatar': student.avatar_path,
+            'email': request.user.email,
+            'tel': student.tel,
+            'wechat': student.wechat,
+            'qq': student.qq,
+            'birthday': student.birthday,
+            'job_title': staff.job_title.__str__(),
+            'school': student.school.__str__()
         })
+
+    def put(self, request):
+        student = self.get_student_object(request.user)
+        request.user.email = request.data['email']
+        student.wechat = request.data['wechat']
+        student.qq = request.data['qq']
+        student.tel = request.data['tel']
+        request.user.save()
+        student.save()
+
+        return Response(status=status.HTTP_202_ACCEPTED)
 
