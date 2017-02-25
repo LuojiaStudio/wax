@@ -6,7 +6,7 @@ from .models import Article, Tag, View
 from user.models import Staff, Student
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import pagination
+from rest_framework import pagination, request
 from rest_framework import generics
 from rest_framework import filters
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -52,7 +52,6 @@ class ArticleList(generics.ListCreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
 
 
 class TagList(generics.ListCreateAPIView):

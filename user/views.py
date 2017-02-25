@@ -115,3 +115,12 @@ class Profile(APIView):
 
         return Response(status=status.HTTP_202_ACCEPTED)
 
+
+@api_view(['GET'])
+def has_perm(request):
+    if (request.user.has_perm(request.GET['perm'])):
+        return JsonResponse({'result': True})
+    else:
+        return JsonResponse({'result': False})
+
+
