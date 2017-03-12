@@ -34,7 +34,7 @@ class ArticleList(generics.ListCreateAPIView):
         filters.SearchFilter
     )
     search_fields = ('title',)
-    filter_fields = ('tags', 'is_checked')
+    filter_fields = ('tags', 'is_checked', 'is_homepage', 'is_notice')
     authentication_classes(IsAuthenticatedOrReadOnly,)
 
     def create(self, request, *args, **kwargs):

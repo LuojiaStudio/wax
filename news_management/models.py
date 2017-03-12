@@ -43,6 +43,8 @@ class Article(BasePost):
     content = models.TextField()
     author = models.CharField(max_length=20, null=True, blank=True)
     photographer = models.CharField(max_length=20, null=True, blank=True)
+    is_homepage = models.BooleanField(default=False)
+    is_notice = models.BooleanField(default=False)
     create_staff = models.ForeignKey(
         Staff,
         related_name='created_articles',

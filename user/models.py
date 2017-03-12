@@ -102,14 +102,14 @@ class Student(models.Model):
         related_name='students',
         on_delete=models.SET_NULL,
         null=True,
-        default=None
+        blank=True
     )
     dormitory = models.ForeignKey(
         Dormitory,
         related_name='students',
         on_delete=models.SET_NULL,
         null=True,
-        default=None
+        blank=True
     )
     avatar_path = models.URLField(blank=True, null=True)
     tel = models.CharField(max_length=20, blank=True, null=True)

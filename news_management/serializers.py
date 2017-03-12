@@ -27,6 +27,8 @@ class ArticleSerializer(serializers.ModelSerializer):
             'last_modify_time',
             'issuing_time',
             'is_checked',
+            'is_homepage',
+            'is_notice',
             'tags',
             'tags_str',
             'view_number',
