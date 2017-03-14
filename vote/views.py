@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import serializers, authentication
@@ -8,10 +8,13 @@ from .models import Activity, Group, Item, Vote
 from user.models import Student, Staff
 from news_management.views import get_ip
 from datetime import date
+import django_filters.rest_framework
 
 
 class StaffPermission(BasePermission):
     def has_permission(self, request, view):
+        if request.method in ('GET', 'HEAD', 'OPTIONS'):
+            return True
         try:
             student = Student.objects.filter(user=request.user)
             staff = Staff.objects.filter(student=student)
@@ -23,7 +26,7 @@ class StaffPermission(BasePermission):
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ('id', 'name', 'starting_time', 'end_time', 'least_vote_num', 'most_vote_num')
+        fields = ('id', 'name', 'content', 'starting_time', 'end_time', 'least_vote_num', 'most_vote_num')
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -35,25 +38,40 @@ class GroupSerializer(serializers.ModelSerializer):
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ('id', 'name', 'cover', 'content', 'id_in_group', 'id_in_activity', 'vote_num')
+        fields = ('id', 'group', 'name', 'cover', 'content', 'id_in_group', 'id_in_activity', 'vote_num')
 
 
 class ActivitySet(viewsets.ModelViewSet):
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
     permission_classes = [StaffPermission]
+    filter_backends = (
+        django_filters.rest_framework.DjangoFilterBackend,
+        filters.SearchFilter
+    )
+    filter_fields = ('id',)
 
 
 class GroupSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [StaffPermission]
+    filter_backends = (
+        django_filters.rest_framework.DjangoFilterBackend,
+        filters.SearchFilter
+    )
+    filter_fields = ('id', 'activity')
 
 
 class ItemSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     permission_classes = [StaffPermission]
+    filter_backends = (
+        django_filters.rest_framework.DjangoFilterBackend,
+        filters.SearchFilter
+    )
+    filter_fields = ('id', 'group')
 
 
 class ListAndCreateVote(APIView):

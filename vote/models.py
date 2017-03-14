@@ -4,6 +4,7 @@ from user.models import Student
 
 class Activity(models.Model):
     name = models.CharField(max_length=100)
+    content = models.TextField()
     starting_time = models.DateTimeField()
     end_time = models.DateTimeField()
     least_vote_num = models.IntegerField(default=0)

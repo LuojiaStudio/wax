@@ -12,6 +12,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from django.http import JsonResponse, Http404
 from django.contrib.auth.models import User
+import re
+import requests
 
 
 # login
@@ -122,5 +124,85 @@ def has_perm(request):
         return JsonResponse({'result': True})
     else:
         return JsonResponse({'result': False})
+
+
+def check_whu_student(request):
+    """
+    check whether request user is whu student
+    :param request:
+    :return:
+    """
+    sid = request.POST['sid']
+    password = request.POST['password']
+
+    r = requests.get('http://cas.whu.edu.cn/authserver/login')
+    lt = re.findall('name="lt" value="(.*)"', r.text)
+    dllt = re.findall('name="dllt" value="(.*)"', r.text)
+    execution = re.findall('name="execution" value="(.*)"', r.text)
+    _eventId = re.findall('name="_eventId" value="(.*)"', r.text)
+    rmShown = re.findall('name="rmShown" value="(.*)"', r.text)
+
+    route = r.cookies['route']
+    jsession_id = r.cookies['JSESSIONID_ids1']
+
+    headers = {
+        'host': 'cas.whu.edu.cn',
+        'Origin': 'http://cas.whu.edu.cn',
+        'Referer': 'http://cas.whu.edu.cn/authserver/login',
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
+    payload = {
+        'username': sid,
+        'password': password,
+        'lt': lt[0],
+        'dllt': dllt[0],
+        'execution': execution[0],
+        '_eventId': _eventId[0],
+        'rmShown': rmShown[0]
+    }
+    cookies = {
+        'route': route,
+        'JSESSIONID_ids1': jsession_id,
+    }
+    r = requests.post('http://cas.whu.edu.cn/authserver/login', data=payload, cookies=cookies, headers=headers)
+
+    if re.search('安全退出', r.text):
+        return True
+    else:
+        return False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
