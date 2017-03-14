@@ -54,6 +54,7 @@ class Vote(models.Model):
         'Item',
         related_name='votes'
     )
+    date = models.DateField(auto_now_add=True)
     time = models.DateTimeField(auto_now_add=True)
     ip = models.GenericIPAddressField()
     user = models.ForeignKey(

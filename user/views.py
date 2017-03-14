@@ -14,6 +14,7 @@ from django.http import JsonResponse, Http404
 from django.contrib.auth.models import User
 import re
 import requests
+from django.views.decorators.csrf import csrf_exempt
 
 
 # login
@@ -126,14 +127,15 @@ def has_perm(request):
         return JsonResponse({'result': False})
 
 
+@api_view(['POST'])
 def check_whu_student(request):
     """
     check whether request user is whu student
     :param request:
     :return:
     """
-    sid = request.POST['sid']
-    password = request.POST['password']
+    sid = request.data['sid']
+    password = request.data['password']
 
     r = requests.get('http://cas.whu.edu.cn/authserver/login')
     lt = re.findall('name="lt" value="(.*)"', r.text)
@@ -168,9 +170,41 @@ def check_whu_student(request):
     r = requests.post('http://cas.whu.edu.cn/authserver/login', data=payload, cookies=cookies, headers=headers)
 
     if re.search('安全退出', r.text):
-        return True
+        return JsonResponse({'result': True})
     else:
-        return False
+        return JsonResponse({'result': False})
+
+
+@api_view(['POST'])
+def login_or_register(request):
+    """
+    login user, if user do not exist, register it
+    :param request:
+    :return:
+    """
+    sid = request.data['sid']
+    password = request.data['password']
+
+    try:
+        student = Student.objects.get(student_number=sid)
+    except Student.DoesNotExist:
+        user = User.objects.create_user(
+            sid,
+            sid + '@whu.edu.cn',
+            password
+        )
+        student = Student(
+            user=user,
+            student_number=sid
+        )
+        student.save()
+    user = student.user
+
+    data = {
+        'token': create_token(user)
+    }
+
+    return Response(data=data, status=status.HTTP_202_ACCEPTED)
 
 
 

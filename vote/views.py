@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, BasePermission
 from .models import Activity, Group, Item, Vote
 from user.models import Student, Staff
 from news_management.views import get_ip
-from datetime import date
+import datetime
 import django_filters.rest_framework
 
 
@@ -84,7 +84,7 @@ class ListAndCreateVote(APIView):
         :param item:
         :return:
         """
-        vote_set = Vote.objects.filter(time__day=date.today(), item__group=item.group)
+        vote_set = Vote.objects.filter(date=datetime.date.today(), item__group=item.group)
         group = item.group
 
         group_most_vote_num = group.most_vote_num
@@ -97,17 +97,25 @@ class ListAndCreateVote(APIView):
         return True
 
     def post(self, request):
-        ip = get_ip(request)
+        if 'HTTP_X_FORWARDED_FOR' in request.META:
+            ip = request.META['HTTP_X_FORWARDED_FOR']
+        else:
+            ip = request.META['REMOTE_ADDR']
+
         user = request.user
         item = request.data['item']
         item_instance = Item.objects.get(pk=item)
 
         if self.check_vote_num(request.user, item_instance):
-            vote = Vote(item=item_instance, ip=ip, user=Student.objects.get(user=user))
+            vote = Vote(
+                item=item_instance,
+                ip=ip,
+                user=Student.objects.get(user=user),
+            )
             vote.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_201_CREATED, data={'msg': 'success'})
         else:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(status=status.HTTP_200_OK, data={'msg': 'exceed limit'})
 
 
 
