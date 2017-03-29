@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^item/(?P<pk>[0-9]+)/$', views.ItemSet.as_view({'get': 'retrieve'})),
 
     url(r'vote/$', views.ListAndCreateVote.as_view())
+
 ]

@@ -7,5 +7,6 @@ urlpatterns = [
     url(r'^profile/$', views.Profile.as_view()),
     url(r'^has_perm/', views.has_perm),
     url(r'^check_whu_student/$', views.check_whu_student),
-    url(r'^login_or_register/$', views.login_or_register)
+    url(r'^login_or_register/$', views.login_or_register),
+    url(r'^tt/$', views.tt)
 ]

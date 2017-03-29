@@ -10,5 +10,6 @@ urlpatterns = [
     url(r'^tag/(?P<pk>[0-9]+)/$', views.TagDetail.as_view()),
     url(r'^article/(?P<pk>[0-9]+)/$', views.ArticleDetail.as_view()),
     url(r'^get_ip/$', views.get_ip),
-    url(r'^view/$', views.view)
+    url(r'^view/$', views.view),
+    url(r'^setview/$', views.set_view),
 ]

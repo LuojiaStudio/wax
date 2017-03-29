@@ -34,7 +34,7 @@ class ArticleList(generics.ListCreateAPIView):
         filters.SearchFilter
     )
     search_fields = ('title',)
-    filter_fields = ('tags', 'is_checked', 'is_homepage', 'is_notice')
+    filter_fields = ('tags', 'is_checked', 'is_homepage', 'is_notice', 'id', 'title')
     authentication_classes(IsAuthenticatedOrReadOnly,)
 
     def create(self, request, *args, **kwargs):
@@ -128,6 +128,15 @@ def view(request):
     response.status_code = 200
 
     return response
+
+@csrf_exempt
+@api_view(['GET', 'POST', ])
+def set_view(request):
+    ip = request.POST['ip']
+    article_id = request.POST['article']
+    article = Article.objects.get(pk=article_id)
+    View.objects.create(ip=ip, article=article)
+    return Response(status=status.HTTP_201_CREATED)
 
 
 

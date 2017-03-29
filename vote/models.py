@@ -1,8 +1,10 @@
 from django.db import models
 from user.models import Student
+import uuid
 
 
 class Activity(models.Model):
+    uuid = models.UUIDField()
     name = models.CharField(max_length=100)
     content = models.TextField()
     starting_time = models.DateTimeField()
@@ -34,7 +36,7 @@ class Item(models.Model):
         related_name='group'
     )
     name = models.CharField(max_length=50)
-    cover = models.URLField(null=True, default=None)
+    cover = models.URLField(null=True, default=None, blank=True)
     content = models.TextField()
     id_in_group = models.IntegerField()
     id_in_activity = models.IntegerField()

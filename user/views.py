@@ -137,7 +137,9 @@ def check_whu_student(request):
     sid = request.data['sid']
     password = request.data['password']
 
-    r = requests.get('http://cas.whu.edu.cn/authserver/login')
+    proxies = {"http": "http://58.243.0.162:9999"}
+
+    r = requests.get('http://cas.whu.edu.cn/authserver/login', proxies=proxies)
     lt = re.findall('name="lt" value="(.*)"', r.text)
     dllt = re.findall('name="dllt" value="(.*)"', r.text)
     execution = re.findall('name="execution" value="(.*)"', r.text)
@@ -154,25 +156,30 @@ def check_whu_student(request):
         'Content-Type': 'application/x-www-form-urlencoded'
     }
 
-    payload = {
-        'username': sid,
-        'password': password,
-        'lt': lt[0],
-        'dllt': dllt[0],
-        'execution': execution[0],
-        '_eventId': _eventId[0],
-        'rmShown': rmShown[0]
-    }
-    cookies = {
-        'route': route,
-        'JSESSIONID_ids1': jsession_id,
-    }
-    r = requests.post('http://cas.whu.edu.cn/authserver/login', data=payload, cookies=cookies, headers=headers)
 
-    if re.search('安全退出', r.text):
-        return JsonResponse({'result': True})
-    else:
-        return JsonResponse({'result': False})
+
+    try:
+        payload = {
+            'username': sid,
+            'password': password,
+            'lt': lt[0],
+            'dllt': dllt[0],
+            'execution': execution[0],
+            '_eventId': _eventId[0],
+            'rmShown': rmShown[0]
+        }
+        cookies = {
+            'route': route,
+            'JSESSIONID_ids1': jsession_id,
+        }
+        r = requests.post('http://cas.whu.edu.cn/authserver/login', data=payload, cookies=cookies, headers=headers, proxies=proxies)
+
+        if re.search('安全退出', r.text):
+            return JsonResponse({'result': True, 'msg': '验证成功'})
+        else:
+            return JsonResponse({'result': False, 'msg': '学号或密码错误'})
+    except:
+        return JsonResponse({'result': False, 'msg': '但这是服务器的锅'})
 
 
 @api_view(['POST'])
@@ -205,6 +212,11 @@ def login_or_register(request):
     }
 
     return Response(data=data, status=status.HTTP_202_ACCEPTED)
+
+
+def tt(request):
+    r = requests.get('http://cas.whu.edu.cn/authserver/login')
+    return Response(data=r.text)
 
 
 
